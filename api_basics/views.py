@@ -118,6 +118,27 @@ def countries_list(request):
         # else:
         #     return Response(serizalizer.errors,status=BAD_REQUEST)
         
+@api_view(['POST'])
+@csrf_exempt
+def create_gr(request):
+    if request.method=="POST":
+        body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[{"amount":"5","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}},"ewallets":[{"ewallet":"ewallet_f49f45152f2081fbccf70052fdd8c9c0"}]},{"amount":"2","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}},"ewallets":[{"ewallet":"ewallet_ad689618491a6161f5c2e49dcf4aa156"}]}]}
+        data_response = make_request('post','/v1/payments/group_payments',body)
+        print(data_response)
+
+        # serizalizer = CountrySerializer(data_response)
+        # print("""
+        # serializer iss 
+
+        # """)
+        # print(serizalizer)
+        # # if serizalizer.is_valid():
+        return Response(status=status.HTTP_201_CREATED)
+        # else:
+        #     return Response(serizalizer.errors,status=BAD_REQUEST)
+        
+
+
 
 
 
