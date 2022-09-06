@@ -13,6 +13,8 @@ class Article(models.Model) :
     def __str__(self):
         return self.title
 
+
+
 class CountriesStatus(models.Model):
     operation_id = models.TextField(primary_key=False)
     message = models.TextField()
@@ -31,3 +33,27 @@ class CountriesData(models.Model):
 class Countries(models.Model):
     status = models.ForeignKey(CountriesStatus,on_delete=models.CASCADE)
     data = models.ForeignKey(CountriesData,on_delete=models.CASCADE)
+
+
+class CustomersStatus(models.Model):
+    operation_id = models.TextField(primary_key=True)
+    message = models.TextField()
+
+class CustomersData(models.Model):
+    id = models.TextField(primary_key=True,default=None)
+    ewallet = models.TextField()
+    name = models.TextField()
+    email = models.TextField()
+    phone_number = models.TextField()
+# class CustomersDataNew(models.Model):
+#     id = models.TextField(primary_key=True,default=None)
+#     ewallet = models.TextField()
+#     name = models.TextField()
+#     email = models.TextField()
+#     phone_number = models.TextField()
+
+class Customers(models.Model):
+    # status = models.ForeignKey(CustomersStatus,on_delete=models.CASCADE)
+    data = models.ForeignKey(CustomersData,on_delete=models.CASCADE)
+
+

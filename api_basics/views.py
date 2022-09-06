@@ -1,5 +1,6 @@
 from http.client import BAD_REQUEST
 import imp
+import json
 from telnetlib import STATUS
 from django.shortcuts import render
 
@@ -7,8 +8,8 @@ from django.http.response import HttpResponse,JsonResponse
 from rest_framework.parsers import JSONParser
 
 from api_basics.utilities.make_request import make_request
-from .models import Article
-from .serilizers import ArticleSerializer, CountrySerializer
+from .models import Article, Customers
+from .serilizers import ArticleSerializer, CountrySerializer, CustomerSerializer, CustomersDataSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -105,14 +106,50 @@ def article_list(request):
 @csrf_exempt
 def countries_list(request):
     if request.method=="GET":
-        data_response = make_request('get','/v1/data/countries','')
-        print(data_response)
-        serizalizer = CountrySerializer(data_response)
+        data_response = make_request('get','/v1/customers?limit=100','')
+        serizalizer = CustomerSerializer(data_response)
         print("""
         serializer iss 
 
         """)
         print(serizalizer)
+        print("""
+        
+        
+        """)
+        news = serizalizer.data
+        for ele in news['data']:
+            print("teri maa ki cjhuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",ele)
+            ele = json.dumps(ele)
+            print(ele)
+            custdataserializer = CustomersDataSerializer(data = json.loads(ele))
+            # custdataserializer = CustomersDataNewSerializer(data = json.loads(ele))
+            print("""
+            
+            
+            """)
+            print(custdataserializer)
+            print(custdataserializer.is_valid())
+            if custdataserializer.is_valid():
+                custdataserializer.save()
+        # if serizalizer.is_valid():
+        #     serizalizer.save()
+
+        # print(serizalizer.is_valid())
+        # if serizalizer.is_valid():
+        #     print(serizalizer.data)
+        #     data=serizalizer.validated_data.get('data')
+        #     print("data is _________________________________________- ",data)
+        #     for ele in data['data'] :
+        #         print("eleeeeeeeeeeeeeeeeeeeee",ele)
+        #         newserializer = CustomersDataSerializer(data = ele)
+
+        #         if newserializer.is_valid():
+        #             print("new seriazl____--------------------------")
+        #             print(newserializer)
+        #             newserializer.save()
+
+        
         # if serizalizer.is_valid():
         return Response(serizalizer.data)
         # else:
