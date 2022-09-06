@@ -1,11 +1,30 @@
 from pyexpat import model
 from rest_framework import serializers
-from .models import Article
+from .models import Article, Countries, CountriesData, CountriesStatus
 
 class ArticleSerializer(serializers.ModelSerializer) :
     class Meta:
         model = Article
-        fields = [ 'id' , 'title' , 'author' ]
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+
+class CountryStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountriesStatus
+        fields = ('operation_id', 'message')
+
+class CountryDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountriesData
+        fields = ('id', 'name','currency_name')
+
+class CountrySerializer(serializers.ModelSerializer):
+    status = CountryStatusSerializer(many=False)
+    data = CountryDataSerializer(many = True)
+    class Meta:
+        model = Countries
+        fields =('status','data')
 
 # class ArticleSerializers(serializers.Serializer):
 #     title = serializers.CharField(max_length=100)
