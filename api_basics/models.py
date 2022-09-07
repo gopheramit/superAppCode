@@ -57,3 +57,49 @@ class Customers(models.Model):
     data = models.ForeignKey(CustomersData,on_delete=models.CASCADE)
 
 
+class Ewallet(models.Model):
+    ewallet = models.TextField()
+
+class Fields(models.Model):
+    number = models.TextField()
+    expiration_month = models.TextField()
+    expiration_year = models.TextField()
+    cvv = models.TextField()
+    name = models.TextField()
+
+
+class PaymentMethod(models.Model):
+    type=models.TextField()
+    fields= models.ForeignKey(Fields,on_delete=models.CASCADE)
+
+
+class Payment(models.Model):
+    amount = models.TextField()
+    currency = models.TextField()
+    payment_method = models.ForeignKey(PaymentMethod,on_delete=models.CASCADE)
+    ewallets = models.ForeignKey(Ewallet,on_delete=models.CASCADE)
+
+
+class MeataData(models.Model):
+    user_defined= models.TextField()
+
+class CreateGroup(models.Model):
+    metadata = models.ForeignKey(MeataData,on_delete=models.CASCADE)
+    merchant_reference_id= models.TextField()
+    payments = models.ForeignKey(Payment,on_delete=models.CASCADE)
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+

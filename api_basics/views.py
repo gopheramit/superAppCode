@@ -1,15 +1,17 @@
+from dataclasses import field
 from http.client import BAD_REQUEST
 import imp
 import json
 from telnetlib import STATUS
+# from xml.dom.xmlbuilder import _DOMInputSourceStringDataType
 from django.shortcuts import render
 
 from django.http.response import HttpResponse,JsonResponse 
 from rest_framework.parsers import JSONParser
 
 from api_basics.utilities.make_request import make_request
-from .models import Article, Customers
-from .serilizers import ArticleSerializer, CountrySerializer, CustomerSerializer, CustomersDataSerializer
+from .models import Article, CreateGroup, Customers, CustomersData, Fields, MeataData, Payment, PaymentMethod
+from .serilizers import ArticleSerializer, CountrySerializer, CreateGroupSerializer, CustomerSerializer, CustomersDataSerializer, EwalletSerializer, FieldsSerializer, PaymentMethodSerializer, PaymentSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -159,17 +161,78 @@ def countries_list(request):
 @csrf_exempt
 def create_gr(request):
     if request.method=="POST":
-        body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[{"amount":"5","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}},"ewallets":[{"ewallet":"ewallet_f49f45152f2081fbccf70052fdd8c9c0"}]},{"amount":"2","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}},"ewallets":[{"ewallet":"ewallet_ad689618491a6161f5c2e49dcf4aa156"}]}]}
+        inputData=request.data
+        cardData1={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"John"}
+        cardData2={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}
+        cardData3={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"amit"}
+        cardData4={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Romonovski"}
+        cardData5={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"James"}
+        cardData6={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Jordan"}
+        cardData7={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}
+        cardData8={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"achal"}
+        dictData={}
+        dictData["ewallet_c908e65751fe5d29e7d27739d6e447dc"]=cardData1
+        dictData["ewallet_ad689618491a6161f5c2e49dcf4aa156"]=cardData2
+        dictData["ewallet_e599f93804d5655c485df3f3062dc90b"]=cardData3
+        dictData["ewallet_24e46058e7fcaa8ce66b34d094964df9"]=cardData4
+        dictData["ewallet_2a42449f995810ed3e35c1a38b773a68"]=cardData5
+        dictData["ewallet_5b15058d8e6015c7324edca8b8dfe1a7"]=cardData6
+        dictData["ewallet_f49f45152f2081fbccf70052fdd8c9c0"]=cardData7
+        dictData["ewallet_c1cf9298de57bafc266805596e1bacde"]=cardData8
+        #print(dictData)
+  
+        #body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[{"amount":"5","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}},"ewallets":[{"ewallet":"ewallet_f49f45152f2081fbccf70052fdd8c9c0"}]},{"amount":"2","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}},"ewallets":[{"ewallet":"ewallet_ad689618491a6161f5c2e49dcf4aa156"}]}]}
+        #data_response = make_request('post','/v1/payments/group_payments',body)
+        #print(data_response)
+        customers=CustomersData.objects.all()
+        serilizer=CustomersDataSerializer(customers,many=True)
+        #print(json.dumps(serilizer.data))
+        AllCustomers=json.dumps(serilizer.data)
+        AllCustomers=json.loads(AllCustomers)
+
+
+
+
+
+
+        payment_list=[]
+        print(inputData["ids"])
+        for i in inputData["ids"]:
+            #payment=[]
+            dict1={}
+            dict1["amount"]="5"
+            dict1["currency"]="USD"
+            paymentMethod={}
+            paymentMethod["type"]="sg_debit_visa_card"
+            ewallets=[]
+            for ele in AllCustomers:
+                if(i==ele["id"]):
+                    ewallet_id=ele["ewallet"]
+                    cardDetail=dictData[ewallet_id]
+                    paymentMethod["fields"]=cardDetail
+                    ewallet={}
+                    ewallet["ewallet"]=ewallet_id
+                    ewallets.append(ewallet)
+                    dict1["payment_method"]=paymentMethod
+                    dict1["ewallets"]=ewallets
+                    payment_list.append(dict1)
+
+
+                    #print(ele["ewallet"],"ewallet id")
+                    #print(cardDetail,"cardDetail")
+
+        #print(payment_list)
+        body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
+        body["payments"]=payment_list
+        #print(body)
         data_response = make_request('post','/v1/payments/group_payments',body)
         print(data_response)
+        #bodySerilizer=CreateGroupSerializer(body)
+        #print(bodySerilizer,"bodySerilizer")
+          
 
-        # serizalizer = CountrySerializer(data_response)
-        # print("""
-        # serializer iss 
+        
 
-        # """)
-        # print(serizalizer)
-        # # if serizalizer.is_valid():
         return Response(status=status.HTTP_201_CREATED)
         # else:
         #     return Response(serizalizer.errors,status=BAD_REQUEST)

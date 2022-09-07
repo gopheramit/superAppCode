@@ -1,6 +1,6 @@
 from pyexpat import model
 from rest_framework import serializers
-from .models import Article, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus
+from .models import CreateGroup,MeataData,Payment,PaymentMethod,Fields,Article, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet
 
 class ArticleSerializer(serializers.ModelSerializer) :
     class Meta:
@@ -68,3 +68,48 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 #         return instance
         
+
+class EwalletSerializer(serializers.ModelSerializer) :
+    class Meta:
+        model = Ewallet
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+class FieldsSerializer(serializers.ModelSerializer) :
+    class Meta:
+        model = Fields
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer) :
+    fields=FieldsSerializer(many=False)
+    class Meta:
+        model = PaymentMethod
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+class PaymentSerializer(serializers.ModelSerializer) :
+    paymentMethod=PaymentMethodSerializer(many=False)
+    ewallets=EwalletSerializer(many=False)
+    class Meta:
+        model = Payment
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+class MeataDataSerializer(serializers.ModelSerializer) :
+    class Meta:
+        model = MeataData
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+class CreateGroupSerializer(serializers.ModelSerializer) :
+    metadata=MeataDataSerializer(many=False)
+    payment=PaymentSerializer(many=True)
+    class Meta:
+        model = CreateGroup
+        # fields = [ 'id' , 'title' , 'author' ]
+        fields = '__all__'
+
+        
+
