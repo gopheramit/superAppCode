@@ -161,6 +161,7 @@ def countries_list(request):
 @csrf_exempt
 def create_gr(request):
     if request.method=="POST":
+        print("request dat is :  ",request.data)
         inputData=request.data
         cardData1={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"John"}
         cardData2={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}
@@ -196,10 +197,11 @@ def create_gr(request):
 
 
         payment_list=[]
-        print(inputData["ids"],"ids")
+        print("inputdata  --------------------------- ",inputData)
+        # print(inputData.ids,"ids")
         amount=int(inputData["amount"])
         n=len(inputData["ids"])
-        print(inputData["amount"],"amount")
+        # print(inputData["amount"],"amount")
         for i in inputData["ids"]:
             #payment=[]
             dict1={}
@@ -228,8 +230,8 @@ def create_gr(request):
         body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
         body["payments"]=payment_list
         print(body)
-        # data_response = make_request('post','/v1/payments/group_payments',body)
-        # print(data_response)
+        data_response = make_request('post','/v1/payments/group_payments',body)
+        print(data_response)
         #bodySerilizer=CreateGroupSerializer(body)
         #print(bodySerilizer,"bodySerilizer")
           
