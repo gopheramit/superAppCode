@@ -196,11 +196,14 @@ def create_gr(request):
 
 
         payment_list=[]
-        print(inputData["ids"])
+        print(inputData["ids"],"ids")
+        amount=int(inputData["amount"])
+        n=len(inputData["ids"])
+        print(inputData["amount"],"amount")
         for i in inputData["ids"]:
             #payment=[]
             dict1={}
-            dict1["amount"]="5"
+            dict1["amount"]=str(round(amount/n))
             dict1["currency"]="USD"
             paymentMethod={}
             paymentMethod["type"]="sg_debit_visa_card"
@@ -224,9 +227,9 @@ def create_gr(request):
         #print(payment_list)
         body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
         body["payments"]=payment_list
-        #print(body)
-        data_response = make_request('post','/v1/payments/group_payments',body)
-        print(data_response)
+        print(body)
+        # data_response = make_request('post','/v1/payments/group_payments',body)
+        # print(data_response)
         #bodySerilizer=CreateGroupSerializer(body)
         #print(bodySerilizer,"bodySerilizer")
           
