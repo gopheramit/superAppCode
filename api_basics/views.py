@@ -245,7 +245,18 @@ def create_gr(request):
 
 
 
-
+@api_view(['POST'])
+@csrf_exempt
+def create_payment(request):
+    if request.method=="POST":
+        inputData=request.data
+        body={"amount":"10","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rahul"}},"ewallets":[{"ewallet":"","percentage":"100"}],"metadata":{"merchant_defined":"true"}}
+        body["amount"]=inputData["amount"]
+        body["ewallets"][0]["ewallet"]=inputData["id"]
+        print(body)
+        data_response = make_request('post','/v1/payments',body)
+        print(data_response)
+        return Response(status=status.HTTP_201_CREATED)
 
 @api_view(['GET','PUT','DELETE'])
 @csrf_exempt

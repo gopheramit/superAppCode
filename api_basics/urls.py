@@ -1,6 +1,6 @@
 
 from django.urls import path 
-from .views import ArticleAPIView, ArticleDetailsAPIView, GenericArticleView, article_detail, article_list, countries_list,create_gr
+from .views import create_payment,ArticleAPIView, ArticleDetailsAPIView, GenericArticleView, article_detail, article_list, countries_list,create_gr
 
 urlpatterns = [
     # path('article/', article_list),
@@ -10,6 +10,7 @@ urlpatterns = [
     path('detail/<int:id>/', ArticleDetailsAPIView.as_view()),
     path('countries/', countries_list),
     path('createPayment/', create_gr),
+    path('pay/', create_payment),
 
  
 ]
