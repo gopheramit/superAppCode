@@ -156,7 +156,19 @@ def countries_list(request):
         return Response(serizalizer.data)
         # else:
         #     return Response(serizalizer.errors,status=BAD_REQUEST)
-        
+
+
+@api_view(['GET'])
+@csrf_exempt
+def getMerchant(request):
+    if request.method=="GET":
+        data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"cab wallet","phone_number":"+18888888888"},{"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"}]
+        return Response(data)
+
+    
+
+
+
 @api_view(['POST'])
 @csrf_exempt
 def create_gr(request):
