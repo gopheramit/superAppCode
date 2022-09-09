@@ -1,8 +1,7 @@
 from django.contrib import  admin
-from .models import Article, Customers, CustomersData
+from .models import CustomersData
 
 # Register your models here.
 
-admin.site.register(Article)
 admin.site.register(CustomersData)
 
