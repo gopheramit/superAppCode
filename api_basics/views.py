@@ -205,35 +205,68 @@ def transactionList(request):
         #if serilizer.is_valid():
         Newarticles=serilizer.data
        # print(serilizer.data,"ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
-        print(Newarticles,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+        # print(Newarticles,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
+        
 
         
         for item in inputData:
             #print(item,"iteemmmmmmmm")
             source=item["source"]
 
-            for i in Newarticles:
-                print("soource@@@@@@@@@@@@@@@@@@@@@@@",type(i),i)
-                if(i["destination"]==item["destination"]):
-                    if(i["source"]==source):
-                        if(item["owned"]=="Y"):
-                            i["amount"]+=item["amount"]
-                        else:
-                            i["amount"]-=item["amount"]
-                    else:
-                        data["source"]=item["source"]
-                        data["amount"]=item["amount"]
-                        data["destination"]=item["destination"]
-                        data["name"]=item["name"]
-                        ListData.append(data)
-        for i in ListData:
-            Newarticles.append(i)
-        print(Newarticles,"newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
-        Newarticles=json.dumps(Newarticles)
-       # print("new aerticlers i s########################################################",Newarticles)
+            # print(Transactions.objects.filter(source=item['source']),"!!!!!!!!!!!!!!!!!")
 
+             
+            # for i in Newarticles:
+            #     print("soource@@@@@@@@@@@@@@@@@@@@@@@",type(i),i)
+            sourceList = []
+            sourceAndAmount={}
+            for ele in Newarticles:
+                sourceList.append(ele["source"])
+                sourceAndAmount[ele["source"]] = ele["amount"]
+
+            
+
+            # check=True
+            print("^^^^^^^^^^^",sourceList)
+            # for ele in Newarticles:
+            #     if(check):
+            if source in sourceList:
+                # print(ele,"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+                # print(ele["s"])
+                print("inside ******************************************")
+                finamount = int(item["amount"]) + int(sourceAndAmount[source])
+                Transactions.objects.filter(source=item['source']).update(amount=str(finamount), destination=item['destination'],)
+                check=False
+            else:
+                data["source"]=item["source"]
+                data["amount"]=item["amount"]
+                data["destination"]=item["destination"]
+                data["name"]=item["name"]
+                ListData.append(data)
+
+            # if(i["destination"]==item["destination"]):
+            #     if(i["source"]==source):
+            #         # if(item["owned"]=="Y"):
+            #         i["amount"] = int(item["amount"]) + int(i["amount"])
+            #         Transactions.objects.filter(source=item['source']).update(amount=str(i['amount']), destination=item['destination'],)
+            #         # else:
+            #         #     i["amount"]-=item["amount"]
+            #         break
+            #     else:
+            #         data["source"]=item["source"]
+            #         data["amount"]=item["amount"]
+            #         data["destination"]=item["destination"]
+            #         data["name"]=item["name"]
+            #         ListData.append(data)
+        # for i in ListData:
+        #     Newarticles.append(i)
+        
+        # Newarticles=json.dumps(ListData)
+       # print("new aerticlers i s########################################################",Newarticles)
+        print("55555555555555555",ListData,"newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
         # if Newarticles.is_valid():
-        serilizerpost=TransactionsSerializer(data=json.loads(Newarticles),many=True)
+        serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
             return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
