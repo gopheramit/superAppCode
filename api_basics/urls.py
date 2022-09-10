@@ -1,6 +1,6 @@
 
 from django.urls import path 
-from .views import accountTransfer,getMerchant, customers_list, createGruopPayment
+from .views import accountTransfer,getMerchant, customers_list, createGruopPayment,setTransferResponse
 #from .views import create_payment
 
 urlpatterns = [
@@ -9,6 +9,7 @@ urlpatterns = [
     # path('pay/', create_payment),
     path('getMerchant/', getMerchant),
     path('accountTransfer/', accountTransfer),
+    path('setTransferResponse/', setTransferResponse),
 
  
 ]

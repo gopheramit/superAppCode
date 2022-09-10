@@ -3,6 +3,7 @@ from http.client import BAD_REQUEST
 import imp
 import json
 from telnetlib import STATUS
+from urllib import response
 # from xml.dom.xmlbuilder import _DOMInputSourceStringDataType
 from django.shortcuts import render
 
@@ -80,6 +81,22 @@ def accountTransfer(request):
         amount=str(inputData["amount"])
         body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
+        print(data_response)
+        responseData={}
+        responseData["amount"]=str(inputData["amount"])
+        responseData["id"]=data_response["data"]["id"]
+        responseData["status"]=data_response["data"]["status"]
+
+        return Response(responseData,status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@csrf_exempt
+def setTransferResponse(request):
+    if request.method=="POST":
+        inputData=request.data
+        id=inputData["id"]
+        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
+        data_response = make_request('post','/v1/account/transfer/response',body)
         print(data_response)
         return Response(status=status.HTTP_201_CREATED)
 
