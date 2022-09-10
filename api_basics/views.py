@@ -1,25 +1,11 @@
-from dataclasses import field
-from http.client import BAD_REQUEST
-import imp
 import json
-from telnetlib import STATUS
-from urllib import response
-# from xml.dom.xmlbuilder import _DOMInputSourceStringDataType
-from django.shortcuts import render
-
-from django.http.response import HttpResponse,JsonResponse 
-from rest_framework.parsers import JSONParser
-
 from api_basics.utilities.make_request import make_request
-from .models import    CustomersData, Transactions
-from .serilizers import    CustomerSerializer, CustomersDataSerializer, TransactionsSerializer
+from .models import CustomersData, Transactions
+from .serilizers import CustomerSerializer, CustomersDataSerializer, TransactionsSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework import generics
-from rest_framework import mixins
 
 
 @api_view(['GET'])
@@ -28,38 +14,12 @@ def customers_list(request):
     if request.method=="GET":
         data_response = make_request('get','/v1/customers?limit=100','')
         serizalizer = CustomerSerializer(data_response)
-        # print("""serializer iss """)
-        # print(serizalizer)
-        # print("""""")
         news = serizalizer.data
         for ele in news['data']:
-            #print("ele",ele)
             ele = json.dumps(ele)
-            #print(ele)
             custdataserializer = CustomersDataSerializer(data = json.loads(ele))
-            # custdataserializer = CustomersDataNewSerializer(data = json.loads(ele))
-            # print("""""")
-            # print(custdataserializer)
-            # print(custdataserializer.is_valid())
             if custdataserializer.is_valid():
                 custdataserializer.save()
-        # if serizalizer.is_valid():
-        #     serizalizer.save()
-        # print(serizalizer.is_valid())
-        # if serizalizer.is_valid():
-        #     print(serizalizer.data)
-        #     data=serizalizer.validated_data.get('data')
-        #     print("data is _________________________________________- ",data)
-        #     for ele in data['data'] :
-        #         print("eleeeeeeeeeeeeeeeeeeeee",ele)
-        #         newserializer = CustomersDataSerializer(data = ele)
-        #         if newserializer.is_valid():
-        #             print("new seriazl____--------------------------")
-        #             print(newserializer)
-        #             newserializer.save()
-        # if serizalizer.is_valid():
-        # else:
-        #     return Response(serizalizer.errors,status=BAD_REQUEST)
         return Response(serizalizer.data)
 
 
@@ -89,6 +49,7 @@ def accountTransfer(request):
 
         return Response(responseData,status=status.HTTP_201_CREATED)
 
+
 @api_view(['POST'])
 @csrf_exempt
 def setTransferResponse(request):
@@ -99,8 +60,6 @@ def setTransferResponse(request):
         data_response = make_request('post','/v1/account/transfer/response',body)
         print(data_response)
         return Response(status=status.HTTP_201_CREATED)
-
-
 
 
 @api_view(['POST'])
@@ -133,8 +92,6 @@ def createGruopPayment(request):
         AllCustomers=json.dumps(serilizer.data)
         AllCustomers=json.loads(AllCustomers)
         payment_list=[]
-        # print("inputdata  --------------------------- ",inputData)
-        # print(inputData.ids,"ids")
         amount=int(inputData["amount"])
         n=len(inputData["ids"])
         # print(inputData["amount"],"amount")
@@ -156,9 +113,6 @@ def createGruopPayment(request):
                     dict1["payment_method"]=paymentMethod
                     dict1["ewallets"]=ewallets
                     payment_list.append(dict1)
-                    #print(ele["ewallet"],"ewallet id")
-                    #print(cardDetail,"cardDetail")
-        #print(payment_list)
         body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
         body["payments"]=payment_list
         #print(body)
@@ -169,106 +123,40 @@ def createGruopPayment(request):
         return Response(status=status.HTTP_201_CREATED)
    
         
-
-# @api_view(['POST'])
-# @csrf_exempt
-# def create_payment(request):
-#     if request.method=="POST":
-#         inputData=request.data
-#         body={"amount":"10","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rahul"}},"ewallets":[{"ewallet":"","percentage":"100"}],"metadata":{"merchant_defined":"true"}}
-#         body["amount"]=inputData["amount"]
-#         body["ewallets"][0]["ewallet"]=inputData["id"]
-#         print(body)
-#         data_response = make_request('post','/v1/payments',body)
-#         print(data_response)
-#         return Response(status=status.HTTP_201_CREATED)
-
 @api_view(['GET','POST'])
 @csrf_exempt
 def transactionList(request):
     if request.method=="GET":
         articles=Transactions.objects.all()
-
         serilizer=TransactionsSerializer(data=articles,many=True)
         print(serilizer.is_valid(),"get serilizer")
         return Response(serilizer.data)
-
     elif request.method=="POST":
         inputData=request.data
-       # print(inputData,"inajfhjdsahgjkhgjkhdsjkghjhg&**********************************************ajkdskj")
         articles=Transactions.objects.all()
         serilizer=TransactionsSerializer(articles,many=True)
         ListData=[]
-        # print("----------------",serilizer)
         data= {}
-        #print("seru!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",serilizer.is_valid())
-        #if serilizer.is_valid():
         Newarticles=serilizer.data
-       # print(serilizer.data,"ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
-        # print(Newarticles,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-
-        
-
-        
         for item in inputData:
-            #print(item,"iteemmmmmmmm")
             source=item["source"]
-
-            # print(Transactions.objects.filter(source=item['source']),"!!!!!!!!!!!!!!!!!")
-
-             
-            # for i in Newarticles:
-            #     print("soource@@@@@@@@@@@@@@@@@@@@@@@",type(i),i)
             sourceList = []
             sourceAndAmount={}
             for ele in Newarticles:
                 sourceList.append(ele["source"])
                 sourceAndAmount[ele["source"]] = ele["amount"]
-
-            
-
-            # check=True
-            print("^^^^^^^^^^^",sourceList)
-            # for ele in Newarticles:
-            #     if(check):
             if source in sourceList:
-                # print(ele,"jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
-                # print(ele["s"])
-                print("inside ******************************************")
                 finamount = int(item["amount"]) + int(sourceAndAmount[source])
                 Transactions.objects.filter(source=item['source']).update(amount=str(finamount), destination=item['destination'],)
-                check=False
             else:
                 data["source"]=item["source"]
                 data["amount"]=item["amount"]
                 data["destination"]=item["destination"]
                 data["name"]=item["name"]
                 ListData.append(data)
-
-            # if(i["destination"]==item["destination"]):
-            #     if(i["source"]==source):
-            #         # if(item["owned"]=="Y"):
-            #         i["amount"] = int(item["amount"]) + int(i["amount"])
-            #         Transactions.objects.filter(source=item['source']).update(amount=str(i['amount']), destination=item['destination'],)
-            #         # else:
-            #         #     i["amount"]-=item["amount"]
-            #         break
-            #     else:
-            #         data["source"]=item["source"]
-            #         data["amount"]=item["amount"]
-            #         data["destination"]=item["destination"]
-            #         data["name"]=item["name"]
-            #         ListData.append(data)
-        # for i in ListData:
-        #     Newarticles.append(i)
-        
-        # Newarticles=json.dumps(ListData)
-       # print("new aerticlers i s########################################################",Newarticles)
-        print("55555555555555555",ListData,"newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
-        # if Newarticles.is_valid():
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
             return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
         return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
-        #return Response(status=status.HTTP_400_BAD_REQUEST)
+

@@ -1,6 +1,6 @@
-from pyexpat import model
 from rest_framework import serializers
 from .models import CreateGroup,MeataData,Payment,PaymentMethod,Fields, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet, Transactions
+
 
 class CountryStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,7 +36,6 @@ class CustomersDataSerializer(serializers.ModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
     data = CustomersDataSerializer(many=True)
-    # status = CustomerStatusSerializer(many=False)
     class Meta:
         model = Customers
         fields = '__all__'
@@ -45,14 +44,12 @@ class CustomerSerializer(serializers.ModelSerializer):
 class EwalletSerializer(serializers.ModelSerializer) :
     class Meta:
         model = Ewallet
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
 
 
 class FieldsSerializer(serializers.ModelSerializer) :
     class Meta:
         model = Fields
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
 
 
@@ -60,33 +57,31 @@ class PaymentMethodSerializer(serializers.ModelSerializer) :
     fields=FieldsSerializer(many=False)
     class Meta:
         model = PaymentMethod
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
+
 
 class PaymentSerializer(serializers.ModelSerializer) :
     paymentMethod=PaymentMethodSerializer(many=False)
     ewallets=EwalletSerializer(many=False)
     class Meta:
         model = Payment
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
+
 
 class MeataDataSerializer(serializers.ModelSerializer) :
     class Meta:
         model = MeataData
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
+
 
 class CreateGroupSerializer(serializers.ModelSerializer) :
     metadata=MeataDataSerializer(many=False)
     payment=PaymentSerializer(many=True)
     class Meta:
         model = CreateGroup
-        # fields = [ 'id' , 'title' , 'author' ]
         fields = '__all__'
 
         
-
 class TransactionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transactions
