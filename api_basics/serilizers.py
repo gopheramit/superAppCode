@@ -1,6 +1,6 @@
 from pyexpat import model
 from rest_framework import serializers
-from .models import CreateGroup,MeataData,Payment,PaymentMethod,Fields, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet
+from .models import CreateGroup,MeataData,Payment,PaymentMethod,Fields, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet, Transactions
 
 class CountryStatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,4 +86,9 @@ class CreateGroupSerializer(serializers.ModelSerializer) :
         fields = '__all__'
 
         
+
+class TransactionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transactions
+        fields ='__all__'
 

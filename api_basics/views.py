@@ -11,8 +11,8 @@ from django.http.response import HttpResponse,JsonResponse
 from rest_framework.parsers import JSONParser
 
 from api_basics.utilities.make_request import make_request
-from .models import    CustomersData
-from .serilizers import    CustomerSerializer, CustomersDataSerializer
+from .models import    CustomersData, Transactions
+from .serilizers import    CustomerSerializer, CustomersDataSerializer, TransactionsSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -183,3 +183,59 @@ def createGruopPayment(request):
 #         print(data_response)
 #         return Response(status=status.HTTP_201_CREATED)
 
+@api_view(['GET','POST'])
+@csrf_exempt
+def transactionList(request):
+    if request.method=="GET":
+        articles=Transactions.objects.all()
+
+        serilizer=TransactionsSerializer(data=articles,many=True)
+        print(serilizer.is_valid(),"get serilizer")
+        return Response(serilizer.data)
+
+    elif request.method=="POST":
+        inputData=request.data
+       # print(inputData,"inajfhjdsahgjkhgjkhdsjkghjhg&**********************************************ajkdskj")
+        articles=Transactions.objects.all()
+        serilizer=TransactionsSerializer(articles,many=True)
+        ListData=[]
+        # print("----------------",serilizer)
+        data= {}
+        #print("seru!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",serilizer.is_valid())
+        #if serilizer.is_valid():
+        Newarticles=serilizer.data
+       # print(serilizer.data,"ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt")
+        print(Newarticles,"&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
+        
+        for item in inputData:
+            #print(item,"iteemmmmmmmm")
+            source=item["source"]
+
+            for i in Newarticles:
+                print("soource@@@@@@@@@@@@@@@@@@@@@@@",type(i),i)
+                if(i["destination"]==item["destination"]):
+                    if(i["source"]==source):
+                        if(item["owned"]=="Y"):
+                            i["amount"]+=item["amount"]
+                        else:
+                            i["amount"]-=item["amount"]
+                    else:
+                        data["source"]=item["source"]
+                        data["amount"]=item["amount"]
+                        data["destination"]=item["destination"]
+                        data["name"]=item["name"]
+                        ListData.append(data)
+        for i in ListData:
+            Newarticles.append(i)
+        print(Newarticles,"newwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+        Newarticles=json.dumps(Newarticles)
+       # print("new aerticlers i s########################################################",Newarticles)
+
+        # if Newarticles.is_valid():
+        serilizerpost=TransactionsSerializer(data=json.loads(Newarticles),many=True)
+        if serilizerpost.is_valid():
+            serilizerpost.save()
+            return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
+        return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
+        #return Response(status=status.HTTP_400_BAD_REQUEST)
