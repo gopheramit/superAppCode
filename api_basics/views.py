@@ -74,13 +74,16 @@ def getMerchant(request):
 @csrf_exempt
 def accountTransfer(request):
     if request.method=="POST":
-        inputData=request.Data
+        inputData=request.data
         source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
         destination_ewallet=inputData["ids"]
         amount=str(inputData["amount"])
         body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
         print(data_response)
+        return Response(status=status.HTTP_201_CREATED)
+
+
 
 
 @api_view(['POST'])
@@ -141,9 +144,9 @@ def createGruopPayment(request):
         #print(payment_list)
         body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
         body["payments"]=payment_list
-        print(body)
+        #print(body)
         data_response = make_request('post','/v1/payments/group_payments',body)
-        print(data_response)
+        #print(data_response)
         #bodySerilizer=CreateGroupSerializer(body)
         #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
