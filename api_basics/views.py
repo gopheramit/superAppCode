@@ -107,7 +107,7 @@ def createGruopPayment(request):
         # print(inputData["amount"],"amount")
         for i in inputData["ids"]:
             dict1={}
-            dict1["amount"]=amount/n
+            dict1["amount"]=str(amount/n)
             dict1["currency"]="USD"
             paymentMethod={}
             paymentMethod["type"]="sg_debit_visa_card"
@@ -254,6 +254,7 @@ def settleUpConfirm(request):
         id=inputData["id"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
         data_response = make_request('post','/v1/account/transfer/response',body)
+        
         Transactions.objects.filter(source=inputData['source']).update(amount=(0))
         return Response(status=status.HTTP_201_CREATED)
         # (data_response)
