@@ -142,20 +142,20 @@ def transactionList(request):
             source=item["source"]
             sourceList = []
             sourceAndAmount={}
-            for ele in Newarticles:
-                sourceList.append(ele["source"])
-                sourceAndAmount[ele["source"]] = ele["amount"]
-            if source in sourceList:
-                finamount = float(item["amount"]) + float(sourceAndAmount[source])
-                # print(int(item["amount"]))
-                # print(int(sourceAndAmount[source]))
-                Transactions.objects.filter(source=item['source']).update(amount=str(finamount), destination=item['destination'],)
-            else:
-                data["source"]=item["source"]
-                data["amount"]=item["amount"]
-                data["destination"]=item["destination"]
-                data["name"]=item["name"]
-                ListData.append(data)
+        for ele in Newarticles:
+            sourceList.append(ele["source"])
+            sourceAndAmount[ele["source"]] = ele["amount"]
+        if source in sourceList:
+            finamount = float(item["amount"]) + float(sourceAndAmount[source])
+            # print(int(item["amount"]))
+            # print(int(sourceAndAmount[source]))
+            Transactions.objects.filter(source=item['source']).update(amount=str(finamount), destination=item['destination'],)
+        else:
+            data["source"]=item["source"]
+            data["amount"]=item["amount"]
+            data["destination"]=item["destination"]
+            data["name"]=item["name"]
+            ListData.append(data)
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
