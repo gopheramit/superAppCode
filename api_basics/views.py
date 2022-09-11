@@ -117,7 +117,7 @@ def createGruopPayment(request):
         body["payments"]=payment_list
         #print(body)
         data_response = make_request('post','/v1/payments/group_payments',body)
-        #print(data_response)
+        print(data_response)
         #bodySerilizer=CreateGroupSerializer(body)
         #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
@@ -163,3 +163,47 @@ def transactionList(request):
             return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
         return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+@csrf_exempt
+def createSalaryPayment(request):
+    if request.method=="POST":
+        #print("request dat is :  ",request.data)
+        inputData=request.data
+        cardData1={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rahul"}
+        customers=CustomersData.objects.all()
+        serilizer=CustomersDataSerializer(customers,many=True)
+        #print(json.dumps(serilizer.data))
+        AllCustomers=json.dumps(serilizer.data)
+        AllCustomers=json.loads(AllCustomers)
+        payment_list=[]
+        amount=int(inputData["amount"])
+        # n=len(inputData["ids"])
+        # print(inputData["amount"],"amount")
+        for i in inputData["ids"]:
+            dict1={}
+            dict1["amount"]=str(amount)
+            dict1["currency"]="USD"
+            paymentMethod={}
+            paymentMethod["type"]="sg_debit_visa_card"
+            ewallets=[]
+            for ele in AllCustomers:
+                if(i==ele["id"]):
+                    ewallet_id=ele["ewallet"]
+                    #cardDetail=dictData[ewallet_id]
+                    paymentMethod["fields"]=cardData1
+                    ewallet={}
+                    ewallet["ewallet"]=ewallet_id
+                    ewallets.append(ewallet)
+                    dict1["payment_method"]=paymentMethod
+                    dict1["ewallets"]=ewallets
+                    payment_list.append(dict1)
+        body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
+        body["payments"]=payment_list
+        #print(body)
+        data_response = make_request('post','/v1/payments/group_payments',body)
+        #print(data_response)
+        #bodySerilizer=CreateGroupSerializer(body)
+        #print(bodySerilizer,"bodySerilizer")
+        return Response(status=status.HTTP_201_CREATED)
+   

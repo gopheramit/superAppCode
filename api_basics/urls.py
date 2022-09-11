@@ -1,6 +1,6 @@
 
 from django.urls import path 
-from .views import transactionList,accountTransfer,getMerchant, customers_list, createGruopPayment,setTransferResponse
+from .views import createSalaryPayment, transactionList,accountTransfer,getMerchant, customers_list, createGruopPayment,setTransferResponse
 
 
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
     path('accountTransfer/', accountTransfer),
     path('setTransferResponse/', setTransferResponse),
     path('transactionList/', transactionList),
+    path('createSalaryPayment/', createSalaryPayment),
 
  
 ]
