@@ -146,13 +146,14 @@ def transactionList(request):
             sourceList.append(ele["source"])
             sourceAndAmount[ele["source"]] = ele["amount"]
         if source in sourceList:
-            finamount = float(item["amount"]) + float(sourceAndAmount[source])
+            finamount = (item["amount"]) + (sourceAndAmount[source])
             # print(int(item["amount"]))
             # print(int(sourceAndAmount[source]))
-            Transactions.objects.filter(source=item['source']).update(amount=str(finamount), destination=item['destination'],)
+            print(finamount)
+            Transactions.objects.filter(source=item['source']).update(amount=(finamount), destination=item['destination'],)
         else:
             data["source"]=item["source"]
-            data["amount"]=item["amount"]
+            data["amount"]=(item["amount"])
             data["destination"]=item["destination"]
             data["name"]=item["name"]
             ListData.append(data)

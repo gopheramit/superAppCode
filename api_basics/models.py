@@ -74,7 +74,7 @@ class Transactions(models.Model):
     source = models.TextField(primary_key=True,default=None)
     name=models.TextField(default=None)
     destination = models.TextField()
-    amount = models.TextField()
+    amount = models.FloatField()
 
 
 
