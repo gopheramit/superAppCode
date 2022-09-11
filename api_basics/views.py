@@ -1,4 +1,6 @@
+from email.policy import HTTP
 import json
+from types import new_class
 from api_basics.utilities.make_request import make_request
 from .models import CustomersData, Transactions
 from .serilizers import CustomerSerializer, CustomersDataSerializer, TransactionsSerializer
@@ -20,7 +22,15 @@ def customers_list(request):
             custdataserializer = CustomersDataSerializer(data = json.loads(ele))
             if custdataserializer.is_valid():
                 custdataserializer.save()
-        return Response(serizalizer.data)
+        # data=[]
+        # for i in news['data']:
+        #     print(i)
+        #     if(i["ewallet"]==""):
+        #         data.append(i["id"])
+        # for j in data:
+        #      data_response = make_request('delete','/v1/customers/'+j,'')
+
+        return Response(serizalizer.data,status=status.HTTP_201_CREATED)
 
 
 @api_view(['GET'])
@@ -92,12 +102,12 @@ def createGruopPayment(request):
         AllCustomers=json.dumps(serilizer.data)
         AllCustomers=json.loads(AllCustomers)
         payment_list=[]
-        amount=int(inputData["amount"])
-        n=len(inputData["ids"])
+        amount=(inputData["amount"])
+        #n=len(inputData["ids"])
         # print(inputData["amount"],"amount")
         for i in inputData["ids"]:
             dict1={}
-            dict1["amount"]=str(round(amount/n))
+            dict1["amount"]=amount
             dict1["currency"]="USD"
             paymentMethod={}
             paymentMethod["type"]="sg_debit_visa_card"
@@ -207,3 +217,45 @@ def createSalaryPayment(request):
         #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
    
+
+@api_view(['POST'])
+@csrf_exempt
+def settleUp(request):
+    if request.method=="POST":
+        inputData=request.data
+        print(inputData,"input daRa")
+        cusid=inputData["source"]
+        amount=str(inputData["amount"])
+        articles=CustomersData.objects.all()
+        serilizer=CustomersDataSerializer(articles,many=True)
+        for i in serilizer.data:
+            if(i["id"]==cusid):
+                destination_ewallet=i["ewallet"]
+
+        print(destination_ewallet,"destination wallet")
+        source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
+        body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
+        data_response = make_request('post','/v1/account/transfer',body)
+        print(data_response)
+        responseData={}
+        responseData["amount"]=str(inputData["amount"])
+        responseData["id"]=data_response["data"]["id"]
+        responseData["status"]=data_response["data"]["status"]
+        responseData["source"]=cusid
+        return Response(responseData,status=status.HTTP_201_CREATED)
+        # return Response(status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+@csrf_exempt
+def settleUpConfirm(request):
+    if request.method=="POST":
+        inputData=request.data
+        id=inputData["id"]
+        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
+        data_response = make_request('post','/v1/account/transfer/response',body)
+        Transactions.objects.filter(source=inputData['source']).update(amount=(0))
+        return Response(status=status.HTTP_201_CREATED)
+        #(data_response)
+
+
