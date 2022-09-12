@@ -148,25 +148,25 @@ def transactionList(request):
         ListData=[]
         data= {}
         Newarticles=serilizer.data
-        for item in inputData:
-            source=item["source"]
-            sourceList = []
-            sourceAndAmount={}
+        sourceList = []
+        sourceAndAmount={}
         for ele in Newarticles:
             sourceList.append(ele["source"])
             sourceAndAmount[ele["source"]] = ele["amount"]
-        if source in sourceList:
-            finamount = (item["amount"]) + (sourceAndAmount[source])
-            # print(int(item["amount"]))
-            # print(int(sourceAndAmount[source]))
-            print(finamount)
-            Transactions.objects.filter(source=item['source']).update(amount=(finamount), destination=item['destination'],)
-        else:
-            data["source"]=item["source"]
-            data["amount"]=(item["amount"])
-            data["destination"]=item["destination"]
-            data["name"]=item["name"]
-            ListData.append(data)
+        for item in inputData:
+            source=item["source"]
+            if source in sourceList:
+                finamount = (item["amount"]) + (sourceAndAmount[source])
+                # print(int(item["amount"]))
+                # print(int(sourceAndAmount[source]))
+                print(finamount)
+                Transactions.objects.filter(source=item['source']).update(amount=(finamount), destination=item['destination'],)
+            else:
+                data["source"]=item["source"]
+                data["amount"]=(item["amount"])
+                data["destination"]=item["destination"]
+                data["name"]=item["name"]
+                ListData.append(data)
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
@@ -254,7 +254,7 @@ def settleUpConfirm(request):
         id=inputData["id"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
         data_response = make_request('post','/v1/account/transfer/response',body)
-        
+
         Transactions.objects.filter(source=inputData['source']).update(amount=(0))
         return Response(status=status.HTTP_201_CREATED)
         # (data_response)
