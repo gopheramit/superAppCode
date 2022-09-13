@@ -150,9 +150,9 @@ def transactionList(request):
                 temp["destination"]=i["destination"]
                 temp["name"]=i["destinationName"]
             elif(i["destinationName"]=="Rahul"):
-                temp["source"]=i["source"]
+                temp["source"]=i["destination"]
                 temp["amount"]=(i["amount"])
-                temp["destination"]=i["destination"]
+                temp["destination"]=i["source"]
                 temp["name"]=i["name"]
             if(len(temp)>0):
                 data.append(temp)
