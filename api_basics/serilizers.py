@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CreateGroup,MeataData,Payment,PaymentMethod,Fields, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet, Transactions
+from .models import TransactionDataResponse,CreateGroup,MeataData,Payment,PaymentMethod,Fields, Countries, CountriesData, CountriesStatus, Customers, CustomersData, CustomersStatus,Ewallet, TransactionData
 
 
 class CountryStatusSerializer(serializers.ModelSerializer):
@@ -84,6 +84,10 @@ class CreateGroupSerializer(serializers.ModelSerializer) :
         
 class TransactionsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Transactions
+        model = TransactionData
         fields ='__all__'
 
+class TransactionDataResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransactionDataResponse
+        fields ='__all__'

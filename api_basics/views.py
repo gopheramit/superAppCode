@@ -1,9 +1,10 @@
 from email.policy import HTTP
+from http.client import TEMPORARY_REDIRECT
 import json
 from types import new_class
 from api_basics.utilities.make_request import make_request
-from .models import CustomersData, Transactions
-from .serilizers import CustomerSerializer, CustomersDataSerializer, TransactionsSerializer
+from .models import CustomersData, TransactionData
+from .serilizers import CustomerSerializer, CustomersDataSerializer, TransactionsSerializer,TransactionDataResponseSerializer
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -137,36 +138,109 @@ def createGruopPayment(request):
 @csrf_exempt
 def transactionList(request):
     if request.method=="GET":
-        articles=Transactions.objects.all()
+        articles=TransactionData.objects.all()
         serilizer=TransactionsSerializer(data=articles,many=True)
         print(serilizer.is_valid(),"get serilizer")
+        data=[]
+        for i in serilizer.data:
+            temp={}
+            if(i["name"]=="Rahul"):
+                temp["source"]=i["source"]
+                temp["amount"]= - (i["amount"])
+                temp["destination"]=i["destination"]
+                temp["name"]=i["destinationName"]
+            elif(i["destinationName"]=="Rahul"):
+                temp["source"]=i["source"]
+                temp["amount"]=(i["amount"])
+                temp["destination"]=i["destination"]
+                temp["name"]=i["name"]
+            if(len(temp)>0):
+                data.append(temp)
+        print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
+        serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
+        if serilizerpost.is_valid():
+            serilizerpost.save()
+            return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
+        return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serilizer.data)
     elif request.method=="POST":
         inputData=request.data
-        articles=Transactions.objects.all()
+        articles=TransactionData.objects.all()
         serilizer=TransactionsSerializer(articles,many=True)
         ListData=[]
         data= {}
         Newarticles=serilizer.data
         sourceList = []
         sourceAndAmount={}
+        destinationList=[]
+        destinationAndAmount={}
         for ele in Newarticles:
             sourceList.append(ele["source"])
-            sourceAndAmount[ele["source"]] = ele["amount"]
+            # sourceAndAmount[ele["source"]] = ele["amount"]
+            destinationList.append(ele["destination"])
+            setSourceList = set(sourceList)
+            setDestinationList = set(destinationList)
+            # destinationAndAmount[ele["destination"]]=ele["amount"]
         for item in inputData:
-            source=item["source"]
-            if source in sourceList:
-                finamount = (item["amount"]) + (sourceAndAmount[source])
-                # print(int(item["amount"]))
-                # print(int(sourceAndAmount[source]))
-                print(finamount)
-                Transactions.objects.filter(source=item['source']).update(amount=(finamount), destination=item['destination'],)
+            sourceItem=item["source"]
+            destinationItem=item["destination"]
+            if sourceItem in sourceList:
+                print("filetred pbject ##########")
+                if destinationItem in destinationList:
+                    # finamount = (item["amount"]) + (sourceAndAmount[source])
+                    filteredAmount = TransactionData.objects.filter(destination = destinationItem, source = sourceItem)
+                    finamount = (item["amount"]) + filteredAmount[0].amount
+                    #print(finamount)
+                    print(filteredAmount,"filetred pbject  normalllllllllll")
+
+                    # print(int(item["amount"]))
+                    # print(int(sourceAndAmount[source]))
+                    # print(finamount)
+                    TransactionData.objects.filter(destination = destinationItem, source = sourceItem).update(amount=(finamount))
+                else:
+                # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                    data={}
+                    data["source"]=item["source"]
+                    data["amount"]=(item["amount"])
+                    data["destination"]=item["destination"]
+                    data["name"]=item["name"]
+                    data["destinationName"]=item["destinationName"]
+                    # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
+                    ListData.append(data)
+            elif destinationItem in sourceList:
+                print("filetred pbject ***********")
+                if sourceItem in destinationList:
+                    filteredAmount = TransactionData.objects.filter(destination = sourceItem, source = destinationItem)
+                    finamount = filteredAmount[0].amount - (item["amount"]) 
+                    print(filteredAmount,"filetred pbject revrerrrrrrrrrrrrrrrrrrrrrrrrr")
+
+                    # print(int(item["amount"]))
+                    # print(int(sourceAndAmount[source]))
+                    # print(finamount)
+                    TransactionData.objects.filter(destination = sourceItem, source = destinationItem).update(amount=(finamount))
+                else:
+                    # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                    data={}
+                    data["source"]=item["source"]
+                    data["amount"]=(item["amount"])
+                    data["destination"]=item["destination"]
+                    data["name"]=item["name"]
+                    data["destinationName"]=item["destinationName"]
+                    # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
+                    ListData.append(data)
             else:
+                # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+                data={}
                 data["source"]=item["source"]
                 data["amount"]=(item["amount"])
                 data["destination"]=item["destination"]
                 data["name"]=item["name"]
+                data["destinationName"]=item["destinationName"]
+                # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
                 ListData.append(data)
+
+        print(ListData,"ListDAraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
@@ -255,7 +329,7 @@ def settleUpConfirm(request):
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
         data_response = make_request('post','/v1/account/transfer/response',body)
 
-        Transactions.objects.filter(source=inputData['source']).update(amount=(0))
+        TransactionData.objects.filter(source=inputData['source']).update(amount=(0))
         return Response(status=status.HTTP_201_CREATED)
         # (data_response)
 

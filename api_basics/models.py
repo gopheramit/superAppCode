@@ -70,14 +70,20 @@ class CreateGroup(models.Model):
     payments = models.ForeignKey(Payment,on_delete=models.CASCADE)
 
     
-class Transactions(models.Model):
+class TransactionData(models.Model):
+    transactionId = models.AutoField(primary_key=True,default=None)
+    source = models.TextField(default=None)
+    name=models.TextField(default=None)
+    destination = models.TextField()
+    amount = models.FloatField()
+    destinationName=models.TextField(default=None)
+
+
+class TransactionDataResponse(models.Model):
     source = models.TextField(primary_key=True,default=None)
     name=models.TextField(default=None)
     destination = models.TextField()
     amount = models.FloatField()
-
-
-
 
 
 
