@@ -180,68 +180,44 @@ def transactionList(request):
         data= {}
         Newarticles=serilizer.data
         sourceList = []
-        sourceAndAmount={}
         destinationList=[]
-        setSourceList = {}
-        destinationAndAmount={}
-        setDestinationList = {}
+        sourceDestToAmount = {}
+        keysfordict = []
         for ele in Newarticles:
+            # sourceDest = {}
             sourceList.append(ele["source"])
             # sourceAndAmount[ele["source"]] = ele["amount"]
             destinationList.append(ele["destination"])
-            setSourceList = set(sourceList)
-            setDestinationList = set(destinationList)
-            print("***************************************",setSourceList,"-----",setDestinationList)
+            sd = ele["source"]+ele["destination"]
+            sourceDestToAmount[sd]=ele["amount"]
+            # print("Sourcedest dict is **",sourceDest)
+
+            # sourceDestToAmount.pus(sourceDest)
+            # print("***************************************",setSourceList,"-----",setDestinationList)
             # destinationAndAmount[ele["destination"]]=ele["amount"]
+        print(sourceDestToAmount)
+        for keys,values in sourceDestToAmount.items():
+            keysfordict.append(keys)
         for item in inputData:
             sourceItem=item["source"]
             destinationItem=item["destination"]
-            if sourceItem in setSourceList:
-                print("filetred pbject ##########")
-                if destinationItem in setDestinationList:
-                    # finamount = (item["amount"]) + (sourceAndAmount[source])
-                    filteredAmount = TransactionData.objects.filter(destination = destinationItem, source = sourceItem)
-                    finamount = (item["amount"]) + filteredAmount[0].amount
-                    #print(finamount)
-                    print(filteredAmount,"filetred pbject  normalllllllllll")
-
-                    # print(int(item["amount"]))
-                    # print(int(sourceAndAmount[source]))
-                    # print(finamount)
-                    TransactionData.objects.filter(destination = destinationItem, source = sourceItem).update(amount=(finamount))
-                else:
+            # print(''''
+            
+            # ''',(sourceItem+destinationItem in keysfordict),(destinationItem+sourceItem in keysfordict),(destinationItem+sourceItem))
+            if (sourceItem+destinationItem) in keysfordict:
+                print('''
+                Inside source dest
+                ''')
+                finalamount = sourceDestToAmount[(sourceItem+destinationItem)] + item["amount"]
+                TransactionData.objects.filter(destination = destinationItem, source = sourceItem).update(amount=(finalamount))  
+            elif (destinationItem+sourceItem) in keysfordict:
+                print('''
+                Inside  dest source
+                ''')
+                finalamount = sourceDestToAmount[(destinationItem+sourceItem)] - item["amount"]
+                TransactionData.objects.filter(destination = sourceItem, source = destinationItem).update(amount=(finalamount))            
                 # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-                    data={}
-                    data["source"]=item["source"]
-                    data["amount"]=(item["amount"])
-                    data["destination"]=item["destination"]
-                    data["name"]=item["name"]
-                    data["destinationName"]=item["destinationName"]
-                    # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
-                    ListData.append(data)
-            elif destinationItem in setSourceList:
-                print("filetred pbject ***********")
-                if sourceItem in setDestinationList:
-                    filteredAmount = TransactionData.objects.filter(destination = sourceItem, source = destinationItem)
-                    finamount = filteredAmount[0].amount - (item["amount"]) 
-                    print(filteredAmount,"filetred pbject revrerrrrrrrrrrrrrrrrrrrrrrrrr")
-
-                    # print(int(item["amount"]))
-                    # print(int(sourceAndAmount[source]))
-                    # print(finamount)
-                    TransactionData.objects.filter(destination = sourceItem, source = destinationItem).update(amount=(finamount))
-                else:
-                    # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-                    data={}
-                    data["source"]=item["source"]
-                    data["amount"]=(item["amount"])
-                    data["destination"]=item["destination"]
-                    data["name"]=item["name"]
-                    data["destinationName"]=item["destinationName"]
-                    # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
-                    ListData.append(data)
             else:
-                # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
                 data={}
                 data["source"]=item["source"]
                 data["amount"]=(item["amount"])
