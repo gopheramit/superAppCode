@@ -133,6 +133,14 @@ def createGruopPayment(request):
         #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
    
+
+@api_view(['GET'])
+@csrf_exempt
+def customers_notNeeded_list(request):
+    if request.method=="GET":
+        articles=TransactionData.objects.all()
+        serilizer=TransactionsSerializer(articles,many=True)
+        return Response(serilizer.data)
         
 @api_view(['GET','POST'])
 @csrf_exempt
@@ -145,25 +153,25 @@ def transactionList(request):
         for i in serilizer.data:
             temp={}
             if(i["name"]=="Rahul"):
-                temp["source"]=i["source"]
-                temp["amount"]= - (i["amount"])
-                temp["destination"]=i["destination"]
+                temp["source"]=i["destination"]
+                temp["amount"]= -(i["amount"])
+                temp["destination"]=i["source"]
                 temp["name"]=i["destinationName"]
             elif(i["destinationName"]=="Rahul"):
-                temp["source"]=i["destination"]
+                temp["source"]=i["source"]
                 temp["amount"]=(i["amount"])
-                temp["destination"]=i["source"]
+                temp["destination"]=i["destination"]
                 temp["name"]=i["name"]
             if(len(temp)>0):
                 data.append(temp)
         print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
         serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
         if serilizerpost.is_valid():
-            serilizerpost.save()
+            # serilizerpost.save()
             return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
         return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serilizer.data)
+        # return Response(serilizer.data)
     elif request.method=="POST":
         inputData=request.data
         articles=TransactionData.objects.all()
@@ -174,20 +182,23 @@ def transactionList(request):
         sourceList = []
         sourceAndAmount={}
         destinationList=[]
+        setSourceList = {}
         destinationAndAmount={}
+        setDestinationList = {}
         for ele in Newarticles:
             sourceList.append(ele["source"])
             # sourceAndAmount[ele["source"]] = ele["amount"]
             destinationList.append(ele["destination"])
             setSourceList = set(sourceList)
             setDestinationList = set(destinationList)
+            print("***************************************",setSourceList,"-----",setDestinationList)
             # destinationAndAmount[ele["destination"]]=ele["amount"]
         for item in inputData:
             sourceItem=item["source"]
             destinationItem=item["destination"]
-            if sourceItem in sourceList:
+            if sourceItem in setSourceList:
                 print("filetred pbject ##########")
-                if destinationItem in destinationList:
+                if destinationItem in setDestinationList:
                     # finamount = (item["amount"]) + (sourceAndAmount[source])
                     filteredAmount = TransactionData.objects.filter(destination = destinationItem, source = sourceItem)
                     finamount = (item["amount"]) + filteredAmount[0].amount
@@ -208,9 +219,9 @@ def transactionList(request):
                     data["destinationName"]=item["destinationName"]
                     # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
                     ListData.append(data)
-            elif destinationItem in sourceList:
+            elif destinationItem in setSourceList:
                 print("filetred pbject ***********")
-                if sourceItem in destinationList:
+                if sourceItem in setDestinationList:
                     filteredAmount = TransactionData.objects.filter(destination = sourceItem, source = destinationItem)
                     finamount = filteredAmount[0].amount - (item["amount"]) 
                     print(filteredAmount,"filetred pbject revrerrrrrrrrrrrrrrrrrrrrrrrrr")
