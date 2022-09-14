@@ -74,10 +74,11 @@ def setTransferResponse(request):
         inputData=request.data
         id=inputData["id"]
         stausInput=inputData["status"]
-        print(status)
+        # print(status)
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":stausInput}
         data_response = make_request('post','/v1/account/transfer/response',body)
         print(data_response)
+
         return Response(status=status.HTTP_201_CREATED)
 
 #Api enpoint to create gruop payment among group of people
@@ -312,7 +313,7 @@ def groupRefund(request):
         inputData=request.data
         id=inputData["id"]
         body={"group_payment":id}
-        #print(body)
+        print(body,"inside create group refund")
         data_response = make_request('post','/v1/refunds/group_payments',body)
-        #print(data_response)
+        print(data_response)
         return Response(data_response["status"]["status"],status=status.HTTP_201_CREATED)
