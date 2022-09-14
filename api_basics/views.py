@@ -19,18 +19,18 @@ def customers_list(request):
         data_response = make_request('get','/v1/customers?limit=100','')
         serizalizer = CustomerSerializer(data_response)
         news = serizalizer.data
-        for ele in news['data']:
-            ele = json.dumps(ele)
-            custdataserializer = CustomersDataSerializer(data = json.loads(ele))
-            if custdataserializer.is_valid():
-                custdataserializer.save()
-        # data=[]
-        # for i in news['data']:
-        #     print(i)
-        #     if(i["ewallet"]==""):
-        #         data.append(i["id"])
-        # for j in data:
-        #      data_response = make_request('delete','/v1/customers/'+j,'')
+        # for ele in news['data']:
+        #     ele = json.dumps(ele)
+        #     custdataserializer = CustomersDataSerializer(data = json.loads(ele))
+        #     if custdataserializer.is_valid():
+        #         custdataserializer.save()
+        data=[]
+        for i in news['data']:
+            print(i)
+            if(i["ewallet"]==""):
+                data.append(i["id"])
+        for j in data:
+             data_response = make_request('delete','/v1/customers/'+j,'')
 
         return Response(serizalizer.data,status=status.HTTP_201_CREATED)
 
@@ -39,7 +39,11 @@ def customers_list(request):
 @csrf_exempt
 def getMerchant(request):
     if request.method=="GET":
-        data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"cab wallet","phone_number":"+18888888888"},{"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"}]
+        data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"Cab wallet","phone_number":"+18888888888"},
+        {"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"},
+        {"ewallet":"ewallet_ac7d0a6885757674fa83dae03f37e966","name":"Groceries wallet","phone_number":"+18888888888"},
+        {"ewallet":"ewallet_07d43efe8c8602b94cde9509ac380ba0","name":"House wallet","phone_number":"+18888888888"},
+        {"ewallet":"ewallet_3f3f26506637bbdbec62f0dd0af121f9","name":"Movie wallet","phone_number":"+18888888888"}]
         return Response(data)
 
 
