@@ -73,9 +73,9 @@ def setTransferResponse(request):
     if request.method=="POST":
         inputData=request.data
         id=inputData["id"]
-        status=inputData["status"]
+        stausInput=inputData["status"]
         print(status)
-        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":status}
+        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":stausInput}
         data_response = make_request('post','/v1/account/transfer/response',body)
         print(data_response)
         return Response(status=status.HTTP_201_CREATED)
