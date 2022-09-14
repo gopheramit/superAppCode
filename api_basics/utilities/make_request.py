@@ -64,6 +64,6 @@ def make_request(method,path,body=''):
         response = requests.post(base_url + path, data=body, headers=headers)
         print(response,"post")
 
-    # if response.status_code != 200:
-    #     raise TypeError(response, method,base_url + path)
+    if response.status_code != 200:
+        raise TypeError(response, method,base_url + path)
     return json.loads(response.content)

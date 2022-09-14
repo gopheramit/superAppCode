@@ -140,10 +140,10 @@ def createGruopPayment(request):
         body["payments"]=payment_list
         #print(body)
         data_response = make_request('post','/v1/payments/group_payments',body)
-        print(data_response)
+        #print(data_response)
         #bodySerilizer=CreateGroupSerializer(body)
         #print(bodySerilizer,"bodySerilizer")
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(data_response["data"]["id"],status.HTTP_201_CREATED)
    
 #Api enpoint created for rapid testing,thid enpoint is not used by the application
 @api_view(['GET'])
@@ -311,8 +311,8 @@ def groupRefund(request):
     if request.method=="POST":
         inputData=request.data
         id=inputData["id"]
-        body={"id":id}
+        body={"group_payment":id}
         #print(body)
         data_response = make_request('post','/v1/refunds/group_payments',body)
-        print(data_response)
-        return Response(status=status.HTTP_201_CREATED)
+        #print(data_response)
+        return Response(data_response["status"]["status"],status=status.HTTP_201_CREATED)
