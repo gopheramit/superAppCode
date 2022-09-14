@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
+# Api endpoint to get all the avialablel customers(all of them are contacts of logged in user for demonstration purpose)
 @api_view(['GET'])
 @csrf_exempt
 def customers_list(request):
@@ -33,7 +34,7 @@ def customers_list(request):
 
         return Response(serizalizer.data,status=status.HTTP_201_CREATED)
 
-
+#Api enpoint to fetch all of the avialabel merchanats with their details.
 @api_view(['GET'])
 @csrf_exempt
 def getMerchant(request):
@@ -41,7 +42,8 @@ def getMerchant(request):
         data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"cab wallet","phone_number":"+18888888888"},{"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"}]
         return Response(data)
 
-    
+
+#Api endpoint to transfer money from ewallet to ewallet
 @api_view(['POST'])
 @csrf_exempt
 def accountTransfer(request):
@@ -57,22 +59,24 @@ def accountTransfer(request):
         responseData["amount"]=str(inputData["amount"])
         responseData["id"]=data_response["data"]["id"]
         responseData["status"]=data_response["data"]["status"]
-
         return Response(responseData,status=status.HTTP_201_CREATED)
 
 
+#Api enpoint to accept ewallet to ewallet transfer request.
 @api_view(['POST'])
 @csrf_exempt
 def setTransferResponse(request):
     if request.method=="POST":
         inputData=request.data
         id=inputData["id"]
-        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
+        status=inputData["status"]
+        print(status)
+        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":status}
         data_response = make_request('post','/v1/account/transfer/response',body)
         print(data_response)
         return Response(status=status.HTTP_201_CREATED)
 
-
+#Api enpoint to create gruop payment among group of people
 @api_view(['POST'])
 @csrf_exempt
 def createGruopPayment(request):
@@ -87,6 +91,8 @@ def createGruopPayment(request):
         cardData6={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Jordan"}
         cardData7={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}
         cardData8={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"achal"}
+        cardData9={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rammohan"}
+        cardData10={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rajesh"}
         dictData={}
         dictData["ewallet_c908e65751fe5d29e7d27739d6e447dc"]=cardData1
         dictData["ewallet_ad689618491a6161f5c2e49dcf4aa156"]=cardData2
@@ -96,6 +102,8 @@ def createGruopPayment(request):
         dictData["ewallet_5b15058d8e6015c7324edca8b8dfe1a7"]=cardData6
         dictData["ewallet_f49f45152f2081fbccf70052fdd8c9c0"]=cardData7
         dictData["ewallet_c1cf9298de57bafc266805596e1bacde"]=cardData8
+        dictData["ewallet_4fcea21a3193ffd1fe6112288dec8a7e"]=cardData9
+        dictData["ewallet_90c9e57ed8572bcba8f4425bec5a46ca"]=cardData10
         #print(dictData)
         customers=CustomersData.objects.all()
         serilizer=CustomersDataSerializer(customers,many=True)
@@ -133,7 +141,7 @@ def createGruopPayment(request):
         #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
    
-
+#Api enpoint created for rapid testing,thid enpoint is not used by the application
 @api_view(['GET'])
 @csrf_exempt
 def customers_notNeeded_list(request):
@@ -142,6 +150,7 @@ def customers_notNeeded_list(request):
         serilizer=TransactionsSerializer(articles,many=True)
         return Response(serilizer.data)
         
+#Api endpoint to fetch all of the transaction and modify the transaction
 @api_view(['GET','POST'])
 @csrf_exempt
 def transactionList(request):
@@ -164,7 +173,7 @@ def transactionList(request):
                 temp["name"]=i["name"]
             if(len(temp)>0):
                 data.append(temp)
-        print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
+        # print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
         serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
         if serilizerpost.is_valid():
             # serilizerpost.save()
@@ -184,39 +193,22 @@ def transactionList(request):
         sourceDestToAmount = {}
         keysfordict = []
         for ele in Newarticles:
-            # sourceDest = {}
             sourceList.append(ele["source"])
-            # sourceAndAmount[ele["source"]] = ele["amount"]
             destinationList.append(ele["destination"])
             sd = ele["source"]+ele["destination"]
             sourceDestToAmount[sd]=ele["amount"]
-            # print("Sourcedest dict is **",sourceDest)
-
-            # sourceDestToAmount.pus(sourceDest)
-            # print("***************************************",setSourceList,"-----",setDestinationList)
-            # destinationAndAmount[ele["destination"]]=ele["amount"]
         print(sourceDestToAmount)
         for keys,values in sourceDestToAmount.items():
             keysfordict.append(keys)
         for item in inputData:
             sourceItem=item["source"]
             destinationItem=item["destination"]
-            # print(''''
-            
-            # ''',(sourceItem+destinationItem in keysfordict),(destinationItem+sourceItem in keysfordict),(destinationItem+sourceItem))
             if (sourceItem+destinationItem) in keysfordict:
-                print('''
-                Inside source dest
-                ''')
                 finalamount = sourceDestToAmount[(sourceItem+destinationItem)] + item["amount"]
                 TransactionData.objects.filter(destination = destinationItem, source = sourceItem).update(amount=(finalamount))  
             elif (destinationItem+sourceItem) in keysfordict:
-                print('''
-                Inside  dest source
-                ''')
                 finalamount = sourceDestToAmount[(destinationItem+sourceItem)] - item["amount"]
                 TransactionData.objects.filter(destination = sourceItem, source = destinationItem).update(amount=(finalamount))            
-                # print(item,"else itemmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
             else:
                 data={}
                 data["source"]=item["source"]
@@ -224,10 +216,7 @@ def transactionList(request):
                 data["destination"]=item["destination"]
                 data["name"]=item["name"]
                 data["destinationName"]=item["destinationName"]
-                # print(data,"data insertionnnnnnnnnnnnnnnnnnnn")
                 ListData.append(data)
-
-        print(ListData,"ListDAraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
@@ -235,22 +224,19 @@ def transactionList(request):
         return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
+#Api endpoint to pay salaries to the selcted employe's
 @api_view(['POST'])
 @csrf_exempt
 def createSalaryPayment(request):
     if request.method=="POST":
-        #print("request dat is :  ",request.data)
         inputData=request.data
         cardData1={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rahul"}
         customers=CustomersData.objects.all()
         serilizer=CustomersDataSerializer(customers,many=True)
-        #print(json.dumps(serilizer.data))
         AllCustomers=json.dumps(serilizer.data)
         AllCustomers=json.loads(AllCustomers)
         payment_list=[]
         amount=int(inputData["amount"])
-        # n=len(inputData["ids"])
-        # print(inputData["amount"],"amount")
         for i in inputData["ids"]:
             dict1={}
             dict1["amount"]=str(amount)
@@ -261,7 +247,6 @@ def createSalaryPayment(request):
             for ele in AllCustomers:
                 if(i==ele["id"]):
                     ewallet_id=ele["ewallet"]
-                    #cardDetail=dictData[ewallet_id]
                     paymentMethod["fields"]=cardData1
                     ewallet={}
                     ewallet["ewallet"]=ewallet_id
@@ -271,14 +256,11 @@ def createSalaryPayment(request):
                     payment_list.append(dict1)
         body={"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[]}
         body["payments"]=payment_list
-        #print(body)
         data_response = make_request('post','/v1/payments/group_payments',body)
-        #print(data_response)
-        #bodySerilizer=CreateGroupSerializer(body)
-        #print(bodySerilizer,"bodySerilizer")
         return Response(status=status.HTTP_201_CREATED)
    
-
+#Api endpoint to settle the trasaction, 
+#ewallet to ewallet transfer from logged in user with person whom loggrd in user wants to settle the baleance 
 @api_view(['POST'])
 @csrf_exempt
 def settleUp(request):
@@ -292,12 +274,11 @@ def settleUp(request):
         for i in serilizer.data:
             if(i["id"]==cusid):
                 destination_ewallet=i["ewallet"]
-
-        print(destination_ewallet,"destination wallet")
+        # print(destination_ewallet,"destination wallet")
         source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
         body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
-        print(data_response)
+        # print(data_response)
         responseData={}
         responseData["amount"]=str(inputData["amount"])
         responseData["id"]=data_response["data"]["id"]
@@ -306,7 +287,7 @@ def settleUp(request):
         return Response(responseData,status=status.HTTP_201_CREATED)
         # return Response(status=status.HTTP_201_CREATED)
 
-
+#Api endpoint to accept the ewallet to ewallet payment request and modify the transaction list data.
 @api_view(['POST'])
 @csrf_exempt
 def settleUpConfirm(request):
@@ -315,9 +296,19 @@ def settleUpConfirm(request):
         id=inputData["id"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
         data_response = make_request('post','/v1/account/transfer/response',body)
-
         TransactionData.objects.filter(source=inputData['source']).update(amount=(0))
         return Response(status=status.HTTP_201_CREATED)
         # (data_response)
 
 
+@api_view(['POST'])
+@csrf_exempt
+def groupRefund(request):
+    if request.method=="POST":
+        inputData=request.data
+        id=inputData["id"]
+        body={"id":id}
+        #print(body)
+        data_response = make_request('post','/v1/refunds/group_payments',body)
+        print(data_response)
+        return Response(status=status.HTTP_201_CREATED)
