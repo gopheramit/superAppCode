@@ -1,6 +1,6 @@
 
 from django.urls import path 
-from .views import groupRefund, customers_notNeeded_list, settleUpConfirm,settleUp,createSalaryPayment, transactionList,accountTransfer,getMerchant, customers_list, createGruopPayment,setTransferResponse
+from .views import Login,groupRefund, customers_notNeeded_list, settleUpConfirm,settleUp,createSalaryPayment, transactionList,accountTransfer,getMerchant, customers_list, createGruopPayment,setTransferResponse
 
 
 urlpatterns = [
@@ -15,6 +15,7 @@ urlpatterns = [
     path('settleUpConfirm/', settleUpConfirm),
     path('notNeeded/', customers_notNeeded_list),
     path('groupRefund/', groupRefund),
+    path('login/', Login),
 
  
 ]
