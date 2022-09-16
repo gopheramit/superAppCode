@@ -167,40 +167,40 @@ def customers_notNeeded_list(request):
 @api_view(['GET','POST'])
 @csrf_exempt
 def transactionList(request):
-    if request.method=="GET":
-        for i in request.data:
-            custId=i["destination"]
-        customer=CustomerDetails(custId)
-        source_name=customer["name"]
-        articles=TransactionData.objects.all()
-        serilizer=TransactionsSerializer(data=articles,many=True)
-        print(serilizer.is_valid(),"get serilizer")
-        data=[]
-        for i in serilizer.data:
-            temp={}
-            #if(i["name"]=="Rahul"):
-            if(i["name"]==source_name):
-                temp["source"]=i["destination"]
-                temp["amount"]= -(i["amount"])
-                temp["destination"]=i["source"]
-                temp["name"]=i["destinationName"]
-            # elif(i["destinationName"]=="Rahul"):
-            elif(i["destinationName"]==source_name):
-                temp["source"]=i["source"]
-                temp["amount"]=(i["amount"])
-                temp["destination"]=i["destination"]
-                temp["name"]=i["name"]
-            if(len(temp)>0):
-                data.append(temp)
-        # print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
-        serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
-        if serilizerpost.is_valid():
-            # serilizerpost.save()
-            return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
-        return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
+    # if request.method=="GET":
+    #     for i in request.data:
+    #         custId=i["destination"]
+    #     customer=CustomerDetails(custId)
+    #     source_name=customer["name"]
+    #     articles=TransactionData.objects.all()
+    #     serilizer=TransactionsSerializer(data=articles,many=True)
+    #     print(serilizer.is_valid(),"get serilizer")
+    #     data=[]
+    #     for i in serilizer.data:
+    #         temp={}
+    #         #if(i["name"]=="Rahul"):
+    #         if(i["name"]==source_name):
+    #             temp["source"]=i["destination"]
+    #             temp["amount"]= -(i["amount"])
+    #             temp["destination"]=i["source"]
+    #             temp["name"]=i["destinationName"]
+    #         # elif(i["destinationName"]=="Rahul"):
+    #         elif(i["destinationName"]==source_name):
+    #             temp["source"]=i["source"]
+    #             temp["amount"]=(i["amount"])
+    #             temp["destination"]=i["destination"]
+    #             temp["name"]=i["name"]
+    #         if(len(temp)>0):
+    #             data.append(temp)
+    #     # print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
+    #     serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
+    #     if serilizerpost.is_valid():
+    #         # serilizerpost.save()
+    #         return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
+    #     return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
 
-        # return Response(serilizer.data)
-    elif request.method=="POST":
+    #     # return Response(serilizer.data)
+    if request.method=="POST":
         inputData=request.data
         articles=TransactionData.objects.all()
         serilizer=TransactionsSerializer(articles,many=True)
@@ -239,6 +239,42 @@ def transactionList(request):
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
             serilizerpost.save()
+            return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
+        return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@csrf_exempt
+def transactionData(request):
+    if request.method=="POST":
+        for i in request.data:
+            custId=i["custId"]
+        #customer=CustomerDetails(custId)
+       #source_name=customer["name"]
+        articles=TransactionData.objects.all()
+        serilizer=TransactionsSerializer(data=articles,many=True)
+        print(serilizer.is_valid(),"get serilizer")
+        data=[]
+        for i in serilizer.data:
+            temp={}
+            #if(i["name"]=="Rahul"):
+            if(i["source"]==custId):
+                temp["source"]=i["destination"]
+                temp["amount"]= -(i["amount"])
+                temp["destination"]=i["source"]
+                temp["name"]=i["destinationName"]
+            # elif(i["destinationName"]=="Rahul"):
+            elif(i["destination"]==custId):
+                temp["source"]=i["source"]
+                temp["amount"]=(i["amount"])
+                temp["destination"]=i["destination"]
+                temp["name"]=i["name"]
+            if(len(temp)>0):
+                data.append(temp)
+        # print(data,"datatatatttttttttttttttttttttttttttttttttttttttttttt")
+        serilizerpost=TransactionDataResponseSerializer(data=data,many=True)
+        if serilizerpost.is_valid():
+            # serilizerpost.save()
             return Response(serilizerpost.data ,status=status.HTTP_201_CREATED)
         return Response(serilizerpost.errors,status=status.HTTP_400_BAD_REQUEST)
 
