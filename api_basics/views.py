@@ -100,6 +100,7 @@ def createGruopPayment(request):
         cardData8={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"achal"}
         cardData9={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rammohan"}
         cardData10={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"rajesh"}
+        cardData11={"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rahul"}
         dictData={}
         dictData["ewallet_c908e65751fe5d29e7d27739d6e447dc"]=cardData1
         dictData["ewallet_ad689618491a6161f5c2e49dcf4aa156"]=cardData2
@@ -111,6 +112,7 @@ def createGruopPayment(request):
         dictData["ewallet_c1cf9298de57bafc266805596e1bacde"]=cardData8
         dictData["ewallet_4fcea21a3193ffd1fe6112288dec8a7e"]=cardData9
         dictData["ewallet_90c9e57ed8572bcba8f4425bec5a46ca"]=cardData10
+        dictData["ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"]=cardData11
         #print(dictData)
         customer=CustomerDetails(inputData["custId"])
         source_wallet=customer["ewallet"]
@@ -354,11 +356,13 @@ def settleUpConfirm(request):
     if request.method=="POST":
         inputData=request.data
         id=inputData["id"]
-        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
+        status1=inputData["status"]
+        body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":status1}
         data_response = make_request('post','/v1/account/transfer/response',body)
-        TransactionData.objects.filter(source=inputData['source'],destination = inputData['destination']).update(amount=(0))
-        TransactionData.objects.filter(destination=inputData['source'],source = inputData['destination']).update(amount=(0))
-        return Response(status=status.HTTP_201_CREATED)
+        if(data_response["status"]["status"!="SUCCESS"] or status1=="decline"):
+            TransactionData.objects.filter(source=inputData['source'],destination = inputData['destination']).update(amount=(0))
+            TransactionData.objects.filter(destination=inputData['source'],source = inputData['destination']).update(amount=(0))
+        return Response(status1 ,status=status.HTTP_201_CREATED)
         # (data_response)
 
 
