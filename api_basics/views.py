@@ -53,7 +53,7 @@ def getMerchant(request):
 def accountTransfer(request):
     if request.method=="POST":
         inputData=request.data
-        customer=CustomerDetails(inputData["custID"])
+        customer=CustomerDetails(inputData["custId"])
         source_wallet=customer["ewallet"]
         #source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
         destination_ewallet=inputData["ids"]
@@ -112,7 +112,7 @@ def createGruopPayment(request):
         dictData["ewallet_4fcea21a3193ffd1fe6112288dec8a7e"]=cardData9
         dictData["ewallet_90c9e57ed8572bcba8f4425bec5a46ca"]=cardData10
         #print(dictData)
-        customer=CustomerDetails(inputData["custID"])
+        customer=CustomerDetails(inputData["custId"])
         source_wallet=customer["ewallet"]
 
 
@@ -247,8 +247,7 @@ def transactionList(request):
 @csrf_exempt
 def transactionData(request):
     if request.method=="POST":
-        for i in request.data:
-            custId=i["custId"]
+        custId=request.data["custId"]
         #customer=CustomerDetails(custId)
        #source_name=customer["name"]
         articles=TransactionData.objects.all()
@@ -357,7 +356,8 @@ def settleUpConfirm(request):
         id=inputData["id"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":"accept"}
         data_response = make_request('post','/v1/account/transfer/response',body)
-        TransactionData.objects.filter(source=inputData['source']).update(amount=(0))
+        TransactionData.objects.filter(source=inputData['source'],destination = inputData['destination']).update(amount=(0))
+        TransactionData.objects.filter(destination=inputData['source'],source = inputData['destination']).update(amount=(0))
         return Response(status=status.HTTP_201_CREATED)
         # (data_response)
 
