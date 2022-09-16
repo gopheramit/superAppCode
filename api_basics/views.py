@@ -379,7 +379,8 @@ def groupRefund(request):
 @csrf_exempt
 def Login(request):
     inputData=request.data
-    if(inputData["password"]=="Admin@123"):
+    cusmId=-1
+    if(inputData["password"]=="Admin@123" and inputData["name"]!="Mohit"):
         articles=CustomersData.objects.all()
         serilizer=CustomersDataSerializer(articles,many=True)
         for i in serilizer.data:
