@@ -1,6 +1,7 @@
 from email.policy import HTTP
 from http.client import TEMPORARY_REDIRECT
 import json
+import re
 from types import new_class
 from api_basics.utilities.make_request import make_request
 from .models import CustomersData, TransactionData
@@ -379,17 +380,18 @@ def groupRefund(request):
         return Response(data_response["status"]["status"],status=status.HTTP_201_CREATED)
 
 
-@api_view(['POST'])
+@api_view(['GET','POST'])
 @csrf_exempt
 def Login(request):
-    inputData=request.data
-    cusmId=-1
-    if(inputData["password"]=="Admin@123" and inputData["name"]!="Mohit"):
-        articles=CustomersData.objects.all()
-        serilizer=CustomersDataSerializer(articles,many=True)
-        for i in serilizer.data:
-            if(i["name"]==inputData["name"]):
-                cusmId=i["id"]
+    if request.method=="POST":
+        inputData=request.data
+        cusmId=-1
+        if(inputData["password"]=="Admin@123" and inputData["name"]!="Mohit"):
+            articles=CustomersData.objects.all()
+            serilizer=CustomersDataSerializer(articles,many=True)
+            for i in serilizer.data:
+                if(i["name"]==inputData["name"]):
+                    cusmId=i["id"]
 
     return Response(cusmId,status=status.HTTP_201_CREATED)
             
