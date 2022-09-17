@@ -348,10 +348,12 @@ def settleUp(request):
         responseData["source"]=cusid
         responseData["message"]=data_response["status"]["message"]
         if(data_response["status"]["status"] == "SUCCESS"):
-            responseData["status"]=data_response["data"]["status"]           
+            responseData["status"]=data_response["data"]["status"] 
+            print(responseData,"succcceeeeessssssssueeesususususususccccecececsececs")          
             return Response(responseData,status=status.HTTP_201_CREATED)
         elif data_response["status"]["status"] == "ERROR":
             responseData["status"]=data_response["data"]["status"] 
+            print(responseData,"erroooooooooooooooooooooooooooooooooooooooooorrrrrrr") 
             return Response(responseData,status=400)
 
 
@@ -367,7 +369,7 @@ def settleUpConfirm(request):
         status1=inputData["status"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":status1}
         data_response = make_request('post','/v1/account/transfer/response',body)
-        if(data_response["status"]["status"]=="SUCCESS" or status1=="accept"):
+        if(data_response["status"]["status"]=="SUCCESS" and status1=="accept"):
             TransactionData.objects.filter(source=inputData['source'],destination = inputData['destination']).update(amount=(0))
             TransactionData.objects.filter(destination=inputData['source'],source = inputData['destination']).update(amount=(0))
         return Response(status1 ,status=status.HTTP_201_CREATED)
