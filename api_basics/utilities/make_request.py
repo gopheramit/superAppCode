@@ -40,7 +40,6 @@ def current_sig_headers(salt, timestamp, signature):
 def pre_call(http_method, path, body=None):
     str_body = json.dumps(body, separators=(',', ':'), ensure_ascii=False) if body else ''
     #str_body = body
-    print(str_body,"str_body")
     salt, timestamp, signature = update_timestamp_salt_sig(http_method=http_method, path=path, body=str_body)
     return str_body.encode('utf-8'), salt, timestamp, signature
 
@@ -49,9 +48,7 @@ def create_headers(http_method, url,  body=None):
     return body, current_sig_headers(salt, timestamp, signature)
 
 def make_request(method,path,body=''):
-    #print(body,"beofre call")
     body, headers = create_headers(method, base_url + path, body)
-    #print(body,"body for call")
     #body="""{"metadata":{"user_defined":"silver"},"merchant_reference_id":"12345689","payments":[{"amount":"5","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Rivers"}},"ewallets":[{"ewallet":"ewallet_f49f45152f2081fbccf70052fdd8c9c0"}]},{"amount":"2","currency":"USD","payment_method":{"type":"sg_debit_visa_card","fields":{"number":"4111111111111111","expiration_month":"10","expiration_year":"23","cvv":"123","name":"Henderson"}},"ewallets":[{"ewallet":"ewallet_ad689618491a6161f5c2e49dcf4aa156"}]}]}"""
 
     if method == 'get':
@@ -62,7 +59,6 @@ def make_request(method,path,body=''):
         response = requests.delete(base_url + path, data=body, headers=headers)
     else:
         response = requests.post(base_url + path, data=body, headers=headers)
-        print(response,"post")
 
     # if response.status_code != 200:
     #     raise TypeError(response, method,base_url + path)
