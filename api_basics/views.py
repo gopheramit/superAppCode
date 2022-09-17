@@ -345,9 +345,16 @@ def settleUp(request):
         responseData={}
         responseData["amount"]=str(inputData["amount"])
         responseData["id"]=data_response["data"]["id"]
-        responseData["status"]=data_response["data"]["status"]
         responseData["source"]=cusid
-        return Response(responseData,status=status.HTTP_201_CREATED)
+        responseData["message"]=data_response["status"]["message"]
+        if(data_response["status"]["status"] == "SUCCESS"):
+            responseData["status"]=data_response["data"]["status"]           
+            return Response(responseData,status=status.HTTP_201_CREATED)
+        elif data_response["status"]["status"] == "ERROR":
+            responseData["status"]=data_response["data"]["status"] 
+            return Response(responseData,status=400)
+
+
         # return Response(status=status.HTTP_201_CREATED)
 
 #Api endpoint to accept the ewallet to ewallet payment request and modify the transaction list data.
@@ -360,7 +367,7 @@ def settleUpConfirm(request):
         status1=inputData["status"]
         body={"id":id,"metadata":{"merchant_defined":"accepted"},"status":status1}
         data_response = make_request('post','/v1/account/transfer/response',body)
-        if(data_response["status"]["status"!="SUCCESS"] or status1=="decline"):
+        if(data_response["status"]["status"]=="SUCCESS" or status1=="accept"):
             TransactionData.objects.filter(source=inputData['source'],destination = inputData['destination']).update(amount=(0))
             TransactionData.objects.filter(destination=inputData['source'],source = inputData['destination']).update(amount=(0))
         return Response(status1 ,status=status.HTTP_201_CREATED)
