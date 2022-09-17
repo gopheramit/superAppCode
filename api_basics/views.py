@@ -338,23 +338,25 @@ def settleUp(request):
                 
         # print(destination_ewallet,"destination wallet")
         source_wallet=source_ewallet
-        # source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
-        body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
+        # source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"#"currency": "USD",
+        body={"source_ewallet": source_wallet,"amount": amount,"destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
         print(data_response,"settle up response ********************************** ")
         responseData={}
-        responseData["amount"]=str(inputData["amount"])
-        responseData["id"]=data_response["data"]["id"]
-        responseData["source"]=cusid
-        responseData["message"]=data_response["status"]["message"]
         if(data_response["status"]["status"] == "SUCCESS"):
+           
+            responseData["amount"]=str(inputData["amount"])
+            responseData["id"]=data_response["data"]["id"]
+            responseData["source"]=cusid
+            responseData["message"]=data_response["status"]["message"]
             responseData["status"]=data_response["data"]["status"] 
             print(responseData,"succcceeeeessssssssueeesususususususccccecececsececs")          
             return Response(responseData,status=status.HTTP_201_CREATED)
         elif data_response["status"]["status"] == "ERROR":
-            responseData["status"]=data_response["data"]["status"] 
+
+            responseData["message"]=data_response["status"]["message"] 
             print(responseData,"erroooooooooooooooooooooooooooooooooooooooooorrrrrrr") 
-            return Response(responseData,status=400)
+            return Response(responseData,status=status.HTTP_201_CREATED)
 
 
         # return Response(status=status.HTTP_201_CREATED)
