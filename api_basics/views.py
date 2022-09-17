@@ -62,11 +62,23 @@ def accountTransfer(request):
         body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
         print(data_response,"account Transfer response ************")
+        # responseData={}
+        # responseData["amount"]=str(inputData["amount"])
+        # responseData["id"]=data_response["data"]["id"]
+        # responseData["status"]=data_response["data"]["status"]
+        # return Response(responseData,status=status.HTTP_201_CREATED)
         responseData={}
-        responseData["amount"]=str(inputData["amount"])
-        responseData["id"]=data_response["data"]["id"]
-        responseData["status"]=data_response["data"]["status"]
-        return Response(responseData,status=status.HTTP_201_CREATED)
+        if(data_response["status"]["status"] == "SUCCESS"):
+            responseData["amount"]=str(inputData["amount"])
+            responseData["id"]=data_response["data"]["id"]
+            responseData["message"]=data_response["status"]["message"]
+            responseData["status"]=data_response["data"]["status"] 
+            print(responseData,"succcceeeeessssssssueeesususususususccccecececsececs")          
+            return Response(responseData,status=status.HTTP_201_CREATED)
+        elif data_response["status"]["status"] == "ERROR":
+            responseData["message"]=data_response["status"]["message"] 
+            print(responseData,"erroooooooooooooooooooooooooooooooooooooooooorrrrrrr") 
+            return Response(responseData,status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @csrf_exempt
@@ -82,11 +94,23 @@ def lentMoney(request):
         body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
         print(data_response,"account Transfer response ************")
+        # responseData={}
+        # responseData["amount"]=str(inputData["amount"])
+        # responseData["id"]=data_response["data"]["id"]
+        # responseData["status"]=data_response["data"]["status"]
+        # return Response(responseData,status=status.HTTP_201_CREATED)
         responseData={}
-        responseData["amount"]=str(inputData["amount"])
-        responseData["id"]=data_response["data"]["id"]
-        responseData["status"]=data_response["data"]["status"]
-        return Response(responseData,status=status.HTTP_201_CREATED)
+        if(data_response["status"]["status"] == "SUCCESS"):
+            responseData["amount"]=str(inputData["amount"])
+            responseData["id"]=data_response["data"]["id"]
+            responseData["message"]=data_response["status"]["message"]
+            responseData["status"]=data_response["data"]["status"] 
+            print(responseData,"succcceeeeessssssssueeesususususususccccecececsececs")          
+            return Response(responseData,status=status.HTTP_201_CREATED)
+        elif data_response["status"]["status"] == "ERROR":
+            responseData["message"]=data_response["status"]["message"] 
+            print(responseData,"erroooooooooooooooooooooooooooooooooooooooooorrrrrrr") 
+            return Response(responseData,status=status.HTTP_201_CREATED)
 
 
 #Api enpoint to accept ewallet to ewallet transfer request.
