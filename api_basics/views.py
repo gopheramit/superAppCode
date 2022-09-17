@@ -68,6 +68,26 @@ def accountTransfer(request):
         responseData["status"]=data_response["data"]["status"]
         return Response(responseData,status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
+@csrf_exempt
+def lentMoney(request):
+    if request.method=="POST":
+        inputData=request.data
+        customer=CustomerDetails(inputData["custId"])
+        source_wallet=customer["ewallet"]
+        #source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"
+        customer=CustomerDetails(inputData["ids"])
+        destination_ewallet=customer["ewallet"]
+        amount=str(inputData["amount"])
+        body={"source_ewallet": source_wallet,"amount": amount,"currency": "USD","destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
+        data_response = make_request('post','/v1/account/transfer',body)
+        print(data_response,"account Transfer response ************")
+        responseData={}
+        responseData["amount"]=str(inputData["amount"])
+        responseData["id"]=data_response["data"]["id"]
+        responseData["status"]=data_response["data"]["status"]
+        return Response(responseData,status=status.HTTP_201_CREATED)
+
 
 #Api enpoint to accept ewallet to ewallet transfer request.
 @api_view(['POST'])
@@ -338,13 +358,12 @@ def settleUp(request):
                 
         # print(destination_ewallet,"destination wallet")
         source_wallet=source_ewallet
-        # source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"#"currency": "USD",
-        body={"source_ewallet": source_wallet,"amount": amount,"destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
+        # source_wallet="ewallet_3cce2ff8b6c4250ed8d93512ddcb78de"#
+        body={"source_ewallet": source_wallet,"currency": "USD","currency": "USD","amount": amount,"destination_ewallet":destination_ewallet,"metadata":{"merchant_defined": "true"}}
         data_response = make_request('post','/v1/account/transfer',body)
         print(data_response,"settle up response ********************************** ")
         responseData={}
         if(data_response["status"]["status"] == "SUCCESS"):
-           
             responseData["amount"]=str(inputData["amount"])
             responseData["id"]=data_response["data"]["id"]
             responseData["source"]=cusid
@@ -353,7 +372,6 @@ def settleUp(request):
             print(responseData,"succcceeeeessssssssueeesususususususccccecececsececs")          
             return Response(responseData,status=status.HTTP_201_CREATED)
         elif data_response["status"]["status"] == "ERROR":
-
             responseData["message"]=data_response["status"]["message"] 
             print(responseData,"erroooooooooooooooooooooooooooooooooooooooooorrrrrrr") 
             return Response(responseData,status=status.HTTP_201_CREATED)
