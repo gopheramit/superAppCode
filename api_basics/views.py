@@ -182,6 +182,7 @@ def transactionList(request):
         inputData=request.data
         articles=TransactionData.objects.all()
         serilizer=TransactionsSerializer(articles,many=True)
+        customer=CustomerDetails(inputData[0]["destination"])
         ListData=[]
         data= {}
         Newarticles=serilizer.data
@@ -211,7 +212,8 @@ def transactionList(request):
                 data["amount"]=(item["amount"])
                 data["destination"]=item["destination"]
                 data["name"]=item["name"]
-                data["destinationName"]=item["destinationName"]
+                #data["destinationName"]=item["destinationName"]
+                data["destinationName"]=customer["name"]
                 ListData.append(data)
         serilizerpost=TransactionsSerializer(data=ListData,many=True)
         if serilizerpost.is_valid():
@@ -227,6 +229,7 @@ def transactionData(request):
         custId=request.data["custId"]
         articles=TransactionData.objects.all()
         serilizer=TransactionsSerializer(data=articles,many=True)
+        print(serilizer.is_valid(),"get serilizer")
         data=[]
         for i in serilizer.data:
             temp={}
