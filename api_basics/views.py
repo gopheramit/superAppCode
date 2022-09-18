@@ -363,6 +363,18 @@ def Login(request):
     return Response(cusmId,status=status.HTTP_201_CREATED)
             
 
+@api_view(['GET','POST'])
+@csrf_exempt
+def getName(request):
+    name=""
+    if request.method=="POST":
+        inputData=request.data
+        
+        customer=CustomerDetails(inputData["custId"])
+        name=customer["name"]
+
+    return Response(name,status=status.HTTP_201_CREATED)
+            
 
 
 def CustomerDetails(custId):
