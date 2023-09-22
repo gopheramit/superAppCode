@@ -29,16 +29,16 @@ def customers_list(request):
         return Response(serizalizer.data,status=status.HTTP_201_CREATED)
 
 #Api enpoint to fetch all of the avialabel merchanats with their details.
-@api_view(['GET'])
-@csrf_exempt
-def getMerchant(request):
-    if request.method=="GET":
-        data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"Cab wallet","phone_number":"+18888888888"},
-        {"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"},
-        {"ewallet":"ewallet_ac7d0a6885757674fa83dae03f37e966","name":"Groceries wallet","phone_number":"+18888888888"},
-        {"ewallet":"ewallet_07d43efe8c8602b94cde9509ac380ba0","name":"House wallet","phone_number":"+18888888888"},
-        {"ewallet":"ewallet_3f3f26506637bbdbec62f0dd0af121f9","name":"Movie wallet","phone_number":"+18888888888"}]
-        return Response(data)
+# @api_view(['GET'])
+# @csrf_exempt
+# def getMerchant(request):
+#     if request.method=="GET":
+#         data=[{"ewallet":"ewallet_4cd1ba086af64550aecd05776faea29a","name":"Cab wallet","phone_number":"+18888888888"},
+#         {"ewallet":"ewallet_f37430011770efc9f31b165865749cfa","name":"Restaurant wallet","phone_number":"+19999999999"},
+#         {"ewallet":"ewallet_ac7d0a6885757674fa83dae03f37e966","name":"Groceries wallet","phone_number":"+18888888888"},
+#         {"ewallet":"ewallet_07d43efe8c8602b94cde9509ac380ba0","name":"House wallet","phone_number":"+18888888888"},
+#         {"ewallet":"ewallet_3f3f26506637bbdbec62f0dd0af121f9","name":"Movie wallet","phone_number":"+18888888888"}]
+#         return Response(data)
 
 
 #Api endpoint to transfer money from ewallet to ewallet
